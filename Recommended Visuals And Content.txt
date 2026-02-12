@@ -1,0 +1,39 @@
+Recommended Visuals And Content
+To make your poster "scannable" for judges, prioritize these four high-impact charts from your analysis:
+
+1. The Decade Decline (The "Hook"): Use the line chart showing the 63% drop in total circulation from 173K (FY15) to 64K (FY24). Highlight the COVID-19 impact as a shaded region to show it accelerated a pre-existing trend.
+
+2. The Engagement Gap (The "Conflict"): Include the bar-over-line chart showing Student Enrollment vs. Total Circulation. This clearly demonstrates that the library is losing "market share" per student, with per-capita usage dropping from 2.04 to 1.52 in just five years.
+
+3. The Technology Pivot (The "Pivot"): Use the chart showing the +66% surge in equipment checkouts (FY21-FY24) against the falling print numbers. This proves the library is still relevant, just for different resources.
+
+4. The Reallocation Matrix (The "Solution"): The horizontal bar chart (Red/Orange/Green) is your most important visual. It tells the judges exactly what to do: Move (DVDs/Music), Monitor (General Collection), and Invest (Equipment/Secured Collections).
+
+
+Poster Content Sections
+=========================
+
+Background / Problem Statement
+- Research Question: What does a decade of TXST Library data reveal about the shift from physical collections to technology demand, and how should resources be reallocated?
+- Context: As digital resources become the norm, academic libraries face a "space-resource" dilemma. Traditional collections like DVDs and print books occupy prime real estate on Floors 5-6, despite plummeting usage.
+
+Methodology
+- Data Source: 10 years of TXST Library circulation records (FY2015-FY2024) and IPEDS enrollment data.
+- Processing: To ensure accuracy against "messy" raw CSV files, the team performed manual verification of annual totals before processing in Python (Pandas).
+- Analysis:
+   - Descriptive: Trend analysis of material types and patron groups.
+   - Predictive: Linear modeling (FY21-24) to forecast a new circulation baseline.
+   - Prescriptive: A priority matrix based on a 30% decline threshold to identify candidates for the Annex Research Center (ARC).
+
+Key Results
+- The Big Drop: Total circulation fell 63% over the decade.
+- The Tech Surge: While print fell, non-traditional items (equipment/laptops) now make up 28% of all checkouts, up from 20% in FY2020.
+- Undergrad Recovery: Undergraduate borrowing rebounded 17% in the last year, while graduate borrowing continued to decline, likely due to a heavier reliance on digital research.
+- Forecast: The "freefall" has ended. Circulation is stabilizing at a new baseline of ~63,600 to 64,000 transactions per year (slope ~ +370/year).
+
+Insights & Recommendations
+- The Behavioral Shift: Students are increasingly using the library for its environment and technology rather than its physical stacks.
+- Actionable Reallocation:
+   - Move to ARC: DVDs, Juvenile, and Music collections (all declined >60%) should be moved to off-site storage.
+   - Repurpose Floors 5-6: Freed shelf space should be converted into study rooms, tech checkout stations, and collaborative zones.
+   - Investment: Significantly increase the budget for equipment lending (cameras, projectors, etc.) and the Secured Collection, both of which are seeing rapid growth.
