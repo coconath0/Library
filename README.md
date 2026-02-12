@@ -16,7 +16,7 @@ Our analysis concludes with a **predictive model** for future circulation volume
 
 ## 📂 Repository Structure
 * `Analysis2.ipynb`: **[Main Analysis]** Jupyter notebook containing data extraction, cleaning, forecasting models (Holt's Linear/Polyfit), and visualization generation.
-* `txst_library_dashboard_v3.html`: Interactive HTML dashboard summarizing the project's descriptive, predictive, and prescriptive analytics.
+* `txst_library_visuals_v3.html`: Interactive HTML dashboard summarizing the project's descriptive, predictive, and prescriptive analytics.
 * `data/`: Contains the raw Excel reports (FY15-FY24) and IPEDS enrollment CSVs.
 * `visuals/`: Directory containing the high-resolution charts used in our poster (Forecast, Matrix, Engagement Gap).
 
