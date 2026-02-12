@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>TXST Library: The Case for Resource Reallocation</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -29,12 +29,14 @@ body {
   background: var(--warm-bg);
   color: var(--charcoal);
   line-height: 1.6;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-/* ── HEADER ── */
+/* HEADER */
 .poster-header {
   background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-deep) 100%);
-  padding: 3rem 2rem 2.5rem;
+  padding: 2rem 1.5rem 2rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -50,15 +52,16 @@ body {
 }
 .poster-header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: clamp(1.4rem, 4vw, 3rem);
   font-weight: 900;
   color: white;
   letter-spacing: -0.02em;
   position: relative;
   margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 .poster-header .subtitle {
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 2vw, 1rem);
   color: var(--gold-light);
   font-weight: 300;
   letter-spacing: 0.1em;
@@ -66,30 +69,56 @@ body {
   position: relative;
 }
 .authors {
-  margin-top: 1.2rem;
+  margin-top: 1rem;
   color: rgba(255,255,255,0.75);
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
   position: relative;
+  line-height: 1.5;
 }
 .authors strong { color: white; font-weight: 500; }
 
-/* ── KPI BAR ── */
+/* BUTTON TO OTHER VISUALS */
+.view-more-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: var(--gold);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid var(--gold-light);
+}
+.view-more-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+}
+
+/* KPI BAR */
 .kpi-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   background: var(--light-border);
   border-bottom: 3px solid var(--maroon);
+  overflow-x: auto;
 }
 .kpi-card {
   background: white;
-  padding: 1.5rem 1rem;
+  padding: 1.2rem 0.8rem;
   text-align: center;
   transition: transform 0.2s;
+  min-width: 150px;
 }
 .kpi-card:hover { transform: translateY(-2px); background: var(--cream); }
 .kpi-label {
-  font-size: 0.65rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.65rem);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #999;
@@ -97,23 +126,24 @@ body {
 }
 .kpi-value {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
   font-weight: 900;
 }
 .kpi-value.red { color: var(--red); }
 .kpi-value.green { color: var(--green); }
 .kpi-value.gold { color: var(--gold); }
-.kpi-sub { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
+.kpi-sub { font-size: clamp(0.7rem, 1.5vw, 0.75rem); color: #aaa; margin-top: 0.2rem; }
 
-/* ── SECTIONS ── */
+/* SECTIONS */
 .poster-body {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1rem;
+  width: 100%;
 }
 
 .section {
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.6s ease forwards;
@@ -131,7 +161,7 @@ body {
 
 .section-tag {
   display: inline-block;
-  font-size: 0.65rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.65rem);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--maroon);
@@ -144,7 +174,7 @@ body {
 
 .section h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.6rem;
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
   font-weight: 700;
   color: var(--maroon);
   margin-bottom: 1rem;
@@ -153,99 +183,106 @@ body {
 }
 
 .section p {
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
   line-height: 1.75;
   color: #555;
-  max-width: 900px;
+  max-width: 100%;
 }
 
-/* ── RESEARCH Q ── */
+/* RESEARCH Q */
 .research-question {
   background: var(--cream);
   border-left: 4px solid var(--gold);
-  padding: 1.5rem 2rem;
+  padding: 1.2rem 1.5rem;
   border-radius: 0 8px 8px 0;
   margin: 1.5rem 0;
 }
 .research-question p {
   font-family: 'Playfair Display', serif;
-  font-size: 1.15rem;
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
   font-style: italic;
   color: var(--charcoal);
   max-width: none;
 }
 
-/* ── CHART CONTAINERS ── */
+/* CHART CONTAINERS */
 .chart-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   margin-top: 1.5rem;
 }
-@media (max-width: 768px) { .chart-grid { grid-template-columns: 1fr; } }
 
 .chart-card {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.05);
   border: 1px solid var(--light-border);
   transition: box-shadow 0.3s, transform 0.2s;
+  width: 100%;
+  overflow: hidden;
 }
 .chart-card:hover {
   box-shadow: 0 6px 30px rgba(0,0,0,0.1);
   transform: translateY(-3px);
 }
-.chart-card.full-width {
-  grid-column: 1 / -1;
-}
 .chart-card h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
   color: var(--maroon);
   margin-bottom: 0.3rem;
 }
 .chart-card .chart-subtitle {
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   color: #999;
   margin-bottom: 1rem;
 }
 .chart-card canvas {
-  max-height: 320px;
+  max-height: 300px;
+  width: 100% !important;
+  height: auto !important;
 }
 .chart-insight {
   margin-top: 1rem;
   padding: 0.8rem 1rem;
   background: rgba(80,18,20,0.03);
   border-radius: 6px;
-  font-size: 0.82rem;
+  font-size: clamp(0.75rem, 2vw, 0.82rem);
   color: #666;
   border-left: 3px solid var(--gold-light);
 }
 .chart-insight strong { color: var(--maroon); }
 
-/* ── HEATMAP TABLE ── */
+/* HEATMAP TABLE */
+.heatmap-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0.5rem -1.2rem;
+  padding: 0 1.2rem;
+}
 .heatmap-table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   margin-top: 0.5rem;
 }
 .heatmap-table th {
-  padding: 0.6rem 0.5rem;
+  padding: 0.6rem 0.4rem;
   text-align: center;
   font-weight: 500;
   color: #888;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 1.8vw, 0.75rem);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .heatmap-table th:first-child { text-align: left; }
 .heatmap-table td {
-  padding: 0.7rem 0.5rem;
+  padding: 0.6rem 0.4rem;
   text-align: center;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   border-bottom: 1px solid #f0f0f0;
   transition: transform 0.15s;
 }
@@ -253,26 +290,26 @@ body {
   text-align: left;
   font-weight: 500;
   color: var(--charcoal);
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
 }
 .heatmap-table tr:hover td { transform: scale(1.02); }
 .heatmap-table .change-col {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
-/* ── RECS ── */
+/* RECS */
 .rec-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
   margin-top: 1.5rem;
 }
-@media (max-width: 768px) { .rec-grid { grid-template-columns: 1fr 1fr; } }
 
 .rec-card {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   text-align: center;
   border: 2px solid transparent;
   transition: all 0.3s;
@@ -284,26 +321,25 @@ body {
 .rec-card.green { border-color: var(--green); }
 .rec-card.blue { border-color: var(--blue); }
 
-.rec-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.rec-title { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.rec-icon { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem; }
+.rec-title { font-weight: 700; font-size: clamp(0.75rem, 2vw, 0.85rem); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
 .rec-card.red .rec-title { color: var(--red); }
 .rec-card.orange .rec-title { color: var(--orange); }
 .rec-card.green .rec-title { color: var(--green); }
 .rec-card.blue .rec-title { color: var(--blue); }
-.rec-desc { font-size: 0.82rem; color: #777; line-height: 1.5; }
+.rec-desc { font-size: clamp(0.75rem, 2vw, 0.82rem); color: #777; line-height: 1.5; }
 
-/* ── METHODOLOGY ── */
+/* METHODOLOGY */
 .method-steps {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
 }
-@media (max-width: 768px) { .method-steps { grid-template-columns: 1fr; } }
 .method-step {
   background: white;
   border-radius: 10px;
-  padding: 1.3rem;
+  padding: 1.2rem;
   border: 1px solid var(--light-border);
   text-align: center;
 }
@@ -319,13 +355,13 @@ body {
   font-size: 0.85rem;
   margin-bottom: 0.6rem;
 }
-.method-step h4 { font-size: 0.9rem; color: var(--maroon); margin-bottom: 0.3rem; }
-.method-step p { font-size: 0.8rem; color: #888; }
+.method-step h4 { font-size: clamp(0.85rem, 2vw, 0.9rem); color: var(--maroon); margin-bottom: 0.3rem; }
+.method-step p { font-size: clamp(0.75rem, 2vw, 0.8rem); color: #888; }
 
-/* ── FOOTER ── */
+/* FOOTER */
 .poster-footer {
   background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-deep) 100%);
-  padding: 2rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   position: relative;
 }
@@ -341,16 +377,63 @@ body {
 .footer-content { position: relative; }
 .footer-content p {
   color: rgba(255,255,255,0.6);
-  font-size: 0.78rem;
+  font-size: clamp(0.7rem, 1.8vw, 0.78rem);
   max-width: 800px;
   margin: 0.3rem auto;
+  line-height: 1.6;
 }
-.footer-content .refs { color: var(--gold-light); font-size: 0.72rem; margin-top: 1rem; }
+.footer-content .refs { color: var(--gold-light); font-size: clamp(0.65rem, 1.8vw, 0.72rem); margin-top: 1rem; }
+
+/* RESPONSIVE BREAKPOINTS */
+@media (min-width: 768px) {
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-card.full-width {
+    grid-column: 1 / -1;
+  }
+  .poster-header {
+    padding: 3rem 2rem 2.5rem;
+  }
+  .poster-body {
+    padding: 2rem 1.5rem;
+  }
+  .rec-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .method-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .kpi-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .chart-card canvas {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .poster-header h1 {
+    font-size: 1.3rem;
+  }
+  .kpi-card {
+    padding: 1rem 0.6rem;
+  }
+  .rec-grid {
+    grid-template-columns: 1fr;
+  }
+  .method-steps {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════ HEADER ═══════ -->
+<!-- HEADER -->
 <header class="poster-header">
   <h1>The Case for Resource Reallocation: A Decade of TXST Library Circulation Trends</h1>
   <div class="subtitle">2026 Open Datathon • Bobcat Data Challenge • FY2015–FY2024</div>
@@ -358,9 +441,10 @@ body {
     <strong>Davos DeHoyos</strong>, <strong>Nathan Negera</strong>, <strong>Aleena Tomy</strong>, <strong>and Nathaly Ingol</strong><br>
     Texas State University, San Marcos, TX
   </div>
+  <a href="txst_library_visuals_v3.html" class="view-more-btn">View More Interactive Graphs</a>
 </header>
 
-<!-- ═══════ KPI BAR ═══════ -->
+<!-- KPI BAR -->
 <div class="kpi-bar">
   <div class="kpi-card">
     <div class="kpi-label">FY2024 Circulation</div>
@@ -386,7 +470,7 @@ body {
 
 <div class="poster-body">
 
-  <!-- ═══════ INTRODUCTION ═══════ -->
+  <!-- INTRODUCTION -->
   <div class="section">
     <span class="section-tag">Introduction / Background</span>
     <h2>From Stacks to Screens</h2>
@@ -397,7 +481,7 @@ body {
     <p>We investigate this using a three-tier analytics framework — descriptive, predictive, and prescriptive — applied to 10 years of circulation reports (FY2015–FY2024), IPEDS enrollment data, and location-level checkout records across 13+ library collections.</p>
   </div>
 
-  <!-- ═══════ METHODOLOGY ═══════ -->
+  <!-- METHODOLOGY -->
   <div class="section">
     <span class="section-tag">Methodology</span>
     <h2>Data & Approach</h2>
@@ -421,7 +505,7 @@ body {
     </div>
   </div>
 
-  <!-- ═══════ RESULTS ═══════ -->
+  <!-- RESULTS -->
   <div class="section">
     <span class="section-tag">Results</span>
     <h2>Key Findings</h2>
@@ -452,7 +536,9 @@ body {
       <div class="chart-card full-width">
         <h3>③ Collection Usage by Location</h3>
         <div class="chart-subtitle">Annual checkouts by collection, FY2017–FY2024. Color intensity = % of peak usage.</div>
-        <table class="heatmap-table" id="heatmapTable"></table>
+        <div class="heatmap-wrapper">
+          <table class="heatmap-table" id="heatmapTable"></table>
+        </div>
         <div class="chart-insight">
           <strong>Finding:</strong> DVD Shelves collapsed <strong>−85%</strong>, Juvenile Collection <strong>−63%</strong> — both are candidates for ARC relocation. General Collection is declining but still the largest single source of loans.
         </div>
@@ -481,7 +567,7 @@ body {
     </div>
   </div>
 
-  <!-- ═══════ DISCUSSION / CONCLUSIONS ═══════ -->
+  <!-- DISCUSSION / CONCLUSIONS -->
   <div class="section">
     <span class="section-tag">Discussion / Conclusions</span>
     <h2>Prescriptive Recommendations</h2>
@@ -513,7 +599,7 @@ body {
     <p style="margin-top: 1.5rem;">The library's future isn't fewer services — it's <em>different</em> services. Students still come to Alkek Library; they come for space, technology, and collaboration rather than books and DVDs. The current 60–64K circulation baseline likely represents the stable floor of core physical demand. Aligning resources with this reality — moving low-use collections to the ARC, expanding equipment lending, and repurposing freed space — will maximize the library's impact per square foot and per dollar invested.</p>
   </div>
 
-  <!-- ═══════ REFERENCES ═══════ -->
+  <!-- REFERENCES -->
   <div class="section">
     <span class="section-tag">References & Acknowledgments</span>
     <h2>Sources</h2>
@@ -531,7 +617,7 @@ body {
 
 </div>
 
-<!-- ═══════ FOOTER ═══════ -->
+<!-- FOOTER -->
 <footer class="poster-footer">
   <div class="footer-content">
     <p><strong style="color: var(--gold-light);">Texas State University</strong> • Alkek Library • 2026 Open Datathon</p>
@@ -540,14 +626,16 @@ body {
 </footer>
 
 <script>
-// ── GLOBAL CHART DEFAULTS ──
+// GLOBAL CHART DEFAULTS
 Chart.defaults.font.family = "'DM Sans', sans-serif";
-Chart.defaults.font.size = 12;
+Chart.defaults.font.size = 11;
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
-Chart.defaults.plugins.legend.labels.padding = 16;
+Chart.defaults.plugins.legend.labels.padding = 12;
 Chart.defaults.plugins.tooltip.backgroundColor = '#2d2d2d';
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
-Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.padding = 10;
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = true;
 
 const MAROON = '#501214';
 const GOLD = '#8b6914';
@@ -568,18 +656,19 @@ new Chart(document.getElementById('chart1'), {
       data: [172909, 161701, 159229, 142201, 111846, 86065, 61659, 64315, 60726, 64090],
       borderColor: MAROON,
       backgroundColor: 'rgba(80,18,20,0.08)',
-      borderWidth: 3,
-      pointRadius: 6,
+      borderWidth: 2.5,
+      pointRadius: 4,
       pointBackgroundColor: '#fff',
       pointBorderColor: MAROON,
-      pointBorderWidth: 2.5,
-      pointHoverRadius: 9,
+      pointBorderWidth: 2,
+      pointHoverRadius: 7,
       fill: true,
       tension: 0.3,
     }]
   },
   options: {
     responsive: true,
+    maintainAspectRatio: true,
     interaction: { intersect: false, mode: 'index' },
     plugins: {
       legend: { display: false },
@@ -593,10 +682,10 @@ new Chart(document.getElementById('chart1'), {
       y: {
         beginAtZero: false,
         min: 40000,
-        ticks: { callback: v => (v/1000)+'K' },
+        ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
         grid: { color: 'rgba(0,0,0,0.04)' }
       },
-      x: { grid: { display: false } }
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
     }
   }
 });
@@ -617,6 +706,7 @@ new Chart(document.getElementById('chart2'), {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: true,
     interaction: { intersect: false, mode: 'index' },
     plugins: {
       tooltip: {
@@ -626,10 +716,10 @@ new Chart(document.getElementById('chart2'), {
       }
     },
     scales: {
-      x: { stacked: true, grid: { display: false } },
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
       y: {
         stacked: true,
-        ticks: { callback: v => (v/1000)+'K' },
+        ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
         grid: { color: 'rgba(0,0,0,0.04)' }
       }
     }
@@ -696,8 +786,8 @@ new Chart(document.getElementById('chart2'), {
           data: actual.concat([null, null, null]),
           borderColor: MAROON,
           backgroundColor: 'rgba(80,18,20,0.06)',
-          borderWidth: 3,
-          pointRadius: 5,
+          borderWidth: 2.5,
+          pointRadius: 4,
           pointBackgroundColor: '#fff',
           pointBorderColor: MAROON,
           pointBorderWidth: 2,
@@ -708,9 +798,9 @@ new Chart(document.getElementById('chart2'), {
           label: 'Forecast',
           data: forecast,
           borderColor: GOLD,
-          borderDash: [8, 4],
-          borderWidth: 2.5,
-          pointRadius: 5,
+          borderDash: [6, 3],
+          borderWidth: 2,
+          pointRadius: 4,
           pointBackgroundColor: '#f5f0e1',
           pointBorderColor: GOLD,
           pointBorderWidth: 2,
@@ -721,6 +811,7 @@ new Chart(document.getElementById('chart2'), {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       interaction: { intersect: false, mode: 'index' },
       plugins: {
         tooltip: {
@@ -732,10 +823,10 @@ new Chart(document.getElementById('chart2'), {
       scales: {
         y: {
           min: 40000,
-          ticks: { callback: v => (v/1000)+'K' },
+          ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
           grid: { color: 'rgba(0,0,0,0.04)' }
         },
-        x: { grid: { display: false } }
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
       }
     }
   });
@@ -759,6 +850,7 @@ new Chart(document.getElementById('chart5'), {
   options: {
     indexAxis: 'y',
     responsive: true,
+    maintainAspectRatio: true,
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -779,11 +871,11 @@ new Chart(document.getElementById('chart5'), {
     scales: {
       x: {
         grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: { callback: v => v + '%' }
+        ticks: { callback: v => v + '%', font: { size: 10 } }
       },
       y: {
         grid: { display: false },
-        ticks: { font: { weight: 500 } }
+        ticks: { font: { weight: 500, size: 10 } }
       }
     }
   }
