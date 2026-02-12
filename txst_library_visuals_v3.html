@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TXST Library — Descriptive, Predictive &amp; Prescriptive Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f0; color: #333; }
+  .header { background: #501214; color: #fff; padding: 28px 40px; }
+  .header h1 { font-size: 1.6em; font-weight: 600; }
+  .header p { font-size: 0.95em; color: #d4a843; margin-top: 4px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card.full { grid-column: 1 / -1; }
+  .card h2 { font-size: 1.05em; color: #501214; margin-bottom: 12px; border-bottom: 2px solid #d4a843; padding-bottom: 6px; }
+  .chart-wrap { position: relative; height: 320px; }
+  .card.full .chart-wrap { height: 360px; }
+  .stat-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-box { flex: 1; min-width: 140px; background: #faf8f4; border-left: 4px solid #d4a843; padding: 14px 16px; border-radius: 0 6px 6px 0; }
+  .stat-box .label { font-size: 0.78em; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-box .value { font-size: 1.5em; font-weight: 700; color: #501214; margin-top: 2px; }
+  .stat-box .sub { font-size: 0.8em; color: #888; }
+  .note { font-size: 0.82em; color: #888; margin-top: 8px; line-height: 1.5; }
+  .insight { background: #fef9e7; border-left: 4px solid #d4a843; padding: 10px 14px; margin-top: 12px; font-size: 0.88em; border-radius: 0 6px 6px 0; }
+  .insight strong { color: #501214; }
+  .section-label { font-size: 0.72em; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; background: #501214; display: inline-block; padding: 4px 12px; border-radius: 3px; margin-bottom: 14px; }
+  .section-label.predictive { background: #1a8a7d; }
+  .section-label.prescriptive { background: #2d5f2d; }
+  .section-divider { margin: 32px 0 20px; text-align: center; }
+  .legend-row { display: flex; gap: 18px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.85em; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .stat-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TXST Library Circulation & Student Enrollment</h1>
+  <p>2026 Open Datathon — Bobcat Data Challenge | FY2014–FY2024 + Forecast</p>
+</div>
+
+<div class="container">
+
+  <!-- ===== UPDATED KPI ROW ===== -->
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="label">FY2024 Circulation</div>
+      <div class="value">64,090</div>
+      <div class="sub">+5.5% from FY2023</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">Fall 2024 Enrollment</div>
+      <div class="value">42,138</div>
+      <div class="sub">+1.1% from 2023</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">Per-Student Usage</div>
+      <div class="value">1.52</div>
+      <div class="sub">Down from 2.04 in FY2020</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">10-Year Circ Decline</div>
+      <div class="value">−63%</div>
+      <div class="sub">173K (FY15) → 64K (FY24)</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">Forecast FY2025</div>
+      <div class="value">~63,624</div>
+      <div class="sub">Linear trend (FY21–24)</div>
+    </div>
+  </div>
+
+  <!-- ============ DESCRIPTIVE SECTION ============ -->
+  <div class="section-divider"><span class="section-label">Descriptive</span></div>
+
+  <div class="grid">
+
+    <div class="card full">
+      <h2>Annual Library Circulation (FY2014–FY2024)</h2>
+      <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Circulation declined 63% over the decade. The decline began well before COVID (−35% from FY2015 to FY2019), then COVID accelerated it. Post-COVID recovery has stabilized around 60–64K.</div>
+    </div>
+
+    <!-- UPGRADED: Dual-Axis LINE chart showing the "jaws" divergence -->
+    <div class="card full">
+      <h2>The Engagement Gap: Enrollment Up, Circulation Down</h2>
+      <div class="chart-wrap"><canvas id="chartDivergence"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> While enrollment held steady (~42K), circulation per student dropped from 2.04 to 1.52 — a 25% decline in per-capita library usage in just 4 years, suggesting a behavioral shift in how students access resources.</div>
+    </div>
+
+    <div class="card">
+      <h2>Circulation by Material Type (FY2020–2024)</h2>
+      <div class="chart-wrap"><canvas id="chart3"></canvas></div>
+      <div class="note">Print/Media includes books, periodicals, and AV. Equipment/Keys includes cameras, projectors, calculators, etc.</div>
+    </div>
+
+    <div class="card">
+      <h2>Equipment & Laptops vs. Print (FY2020–2024)</h2>
+      <div class="chart-wrap"><canvas id="chart4"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Equipment checkouts surged 75% in FY2024, while print fell. Non-traditional items now make up 28% of all checkouts, up from 20% in FY2020.</div>
+    </div>
+
+    <div class="card">
+      <h2>Borrowing by Patron Group — FY2024</h2>
+      <div class="chart-wrap"><canvas id="chart5"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>Undergraduate vs. Graduate Checkouts</h2>
+      <div class="chart-wrap"><canvas id="chart6"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Undergraduate checkouts rebounded 17% from FY2023 to FY2024, while graduate borrowing continued to decline — possibly reflecting greater digital resource use among grad students.</div>
+    </div>
+
+    <div class="card full">
+      <h2>Top Library Locations by Circulation (FY2024)</h2>
+      <div class="chart-wrap"><canvas id="chart7"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ============ PREDICTIVE SECTION ============ -->
+  <div class="section-divider"><span class="section-label predictive">Predictive</span></div>
+
+  <div class="grid">
+    <div class="card full">
+      <h2>Circulation Forecast: Stabilizing Around 60–65K Baseline</h2>
+      <div class="chart-wrap"><canvas id="chartForecast"></canvas></div>
+      <div class="insight"><strong>Model:</strong> A linear fit on FY2021–FY2024 data (slope ≈ +370 transactions/year) projects FY2025 at ~63,624 and FY2026 at ~63,994. The decade-long freefall has ended; circulation is stabilizing at a new, lower baseline — freeing resources for reallocation.</div>
+    </div>
+  </div>
+
+  <!-- ============ PRESCRIPTIVE SECTION ============ -->
+  <div class="section-divider"><span class="section-label prescriptive">Prescriptive</span></div>
+
+  <div class="grid">
+    <div class="card full">
+      <h2>Resource Reallocation Priority Matrix</h2>
+      <div class="legend-row">
+        <span class="legend-item"><span class="legend-dot" style="background:#c0392b;"></span> Move to ARC (decline &gt; 30%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f39c12;"></span> Monitor (decline &lt; 30%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#27ae60;"></span> Invest More (growing)</span>
+      </div>
+      <div class="chart-wrap" style="height:380px;"><canvas id="chartMatrix"></canvas></div>
+      <div class="insight"><strong>Recommendation:</strong> DVD, Juvenile, and Music collections have declined &gt;60% and are candidates for transfer to the Annex Research Center (ARC). Freed shelf space on Floors 5–6 should be repurposed for study rooms, tech checkout stations, and collaborative work areas. Equipment lending and the Secured Collection are growing rapidly and warrant increased investment.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== Color palette ===== */
+const maroon = '#501214';
+const gold = '#d4a843';
+const maroonLight = '#8c3a3d';
+const goldLight = '#e8c875';
+const gray = '#888';
+const blue = '#2c6fbb';
+const teal = '#1a8a7d';
+
+Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels = { display: false };
+
+/* ===== Chart 1: Annual Circulation Bar ===== */
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: {
+    labels: ['FY14','FY15','FY16','FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24'],
+    datasets: [{
+      label: 'Annual Checkouts',
+      data: [152664,172909,161701,159229,142201,111846,86065,61659,64315,60726,64090],
+      backgroundColor: [maroon,maroon,maroon,maroon,maroon,maroon,'#a04244','#c06062','#c06062',maroonLight,maroonLight],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + ' checkouts' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => (v/1000)+'K' }, title: { display: true, text: 'Total Checkouts' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+/* ===== UPGRADED: Dual-Axis Divergence Line Chart ===== */
+(() => {
+  const years = ['FY15','FY16','FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24'];
+  const circ =  [172909,161701,159229,142201,111846,86065,61659,64315,60726,64090];
+  /* Enrollment: only available for overlapping years; null elsewhere */
+  const enroll = [null,null,null,null,null,42292,null,null,41676,42138];
+
+  new Chart(document.getElementById('chartDivergence'), {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'Annual Circulation',
+          data: circ,
+          borderColor: maroon,
+          backgroundColor: maroon,
+          pointRadius: 5,
+          pointStyle: 'circle',
+          borderWidth: 3,
+          tension: 0.25,
+          yAxisID: 'yCirc',
+          fill: false
+        },
+        {
+          label: 'Student Enrollment',
+          data: enroll,
+          borderColor: gold,
+          backgroundColor: gold,
+          pointRadius: 7,
+          pointStyle: 'rectRot',
+          borderWidth: 3,
+          borderDash: [6, 4],
+          tension: 0,
+          yAxisID: 'yEnroll',
+          spanGaps: false,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 14, font: { size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + (ctx.raw ? ctx.raw.toLocaleString() : 'N/A') } }
+      },
+      scales: {
+        yCirc: {
+          type: 'linear', position: 'left',
+          title: { display: true, text: 'Annual Circulation', color: maroon, font: { weight: 'bold' } },
+          ticks: { color: maroon, callback: v => (v/1000)+'K' },
+          grid: { color: 'rgba(80,18,20,0.08)' },
+          min: 40000, max: 200000
+        },
+        yEnroll: {
+          type: 'linear', position: 'right',
+          title: { display: true, text: 'Student Enrollment', color: '#b8860b', font: { weight: 'bold' } },
+          ticks: { color: '#b8860b', callback: v => (v/1000)+'K' },
+          grid: { drawOnChartArea: false },
+          min: 35000, max: 50000
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+})();
+
+/* ===== Chart 3: By type stacked ===== */
+new Chart(document.getElementById('chart3'), {
+  type: 'bar',
+  data: {
+    labels: ['FY20','FY21','FY22','FY23','FY24'],
+    datasets: [
+      { label: 'Print/Media', data: [60516,45702,47984,46103,44715], backgroundColor: maroon },
+      { label: 'Reserve', data: [8432,2435,3587,3394,1493], backgroundColor: goldLight },
+      { label: 'Equipment/Keys', data: [7399,8795,7388,8371,14616], backgroundColor: teal },
+      { label: 'Laptops/Computers', data: [9718,4727,5356,2858,3266], backgroundColor: blue }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, ticks: { callback: v => (v/1000)+'K' } }
+    }
+  }
+});
+
+/* ===== Chart 4: Equipment share ===== */
+const equipPct = [((7399+9718)/86065*100).toFixed(1), ((8795+4727)/61659*100).toFixed(1), ((7388+5356)/64315*100).toFixed(1), ((8371+2858)/60726*100).toFixed(1), ((14616+3266)/64090*100).toFixed(1)];
+const printPct = [(60516/86065*100).toFixed(1), (45702/61659*100).toFixed(1), (47984/64315*100).toFixed(1), (46103/60726*100).toFixed(1), (44715/64090*100).toFixed(1)];
+new Chart(document.getElementById('chart4'), {
+  type: 'line',
+  data: {
+    labels: ['FY20','FY21','FY22','FY23','FY24'],
+    datasets: [
+      { label: '% Print/Media', data: printPct, borderColor: maroon, backgroundColor: maroon, tension: 0.3, pointRadius: 5, borderWidth: 2.5 },
+      { label: '% Equipment + Laptops', data: equipPct, borderColor: teal, backgroundColor: teal, tension: 0.3, pointRadius: 5, borderWidth: 2.5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+    scales: {
+      y: { min: 0, max: 85, ticks: { callback: v => v + '%' }, title: { display: true, text: 'Share of Total Checkouts' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+/* ===== Chart 5: Patron pie FY2024 ===== */
+new Chart(document.getElementById('chart5'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Undergraduate', 'Graduate', 'Faculty', 'Staff', 'Other (ILL, etc.)'],
+    datasets: [{ data: [35383, 5246, 13127, 3109, 7078], backgroundColor: [maroon, maroonLight, gold, teal, gray] }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      datalabels: {
+        display: true, color: '#fff', font: { weight: 'bold', size: 12 },
+        formatter: (value) => ((value/63943)*100).toFixed(1) + '%'
+      },
+      legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+      tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.raw.toLocaleString() + ' (' + ((ctx.raw/63943)*100).toFixed(1) + '%)' } }
+    }
+  }
+});
+
+/* ===== Chart 6: UG vs Grad ===== */
+new Chart(document.getElementById('chart6'), {
+  type: 'bar',
+  data: {
+    labels: ['FY20','FY21','FY22','FY23','FY24'],
+    datasets: [
+      { label: 'Undergraduate', data: [51397,30257,34257,31533,35383], backgroundColor: maroon, borderRadius: 3 },
+      { label: 'Graduate', data: [8388,7076,7358,5584,5246], backgroundColor: gold, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+    scales: { y: { beginAtZero: true, ticks: { callback: v => (v/1000)+'K' } }, x: { grid: { display: false } } }
+  }
+});
+
+/* ===== Chart 7: Top locations FY2024 ===== */
+const locData = [
+  ['General Collection', 33756], ['Secured Collection', 12601], ['Laptops', 3266],
+  ['Juvenile Collection', 2940], ['Alkek One', 1941], ['Graphic Novels', 1778],
+  ['Music Library', 1370], ['Ask Alkek/Reserve', 1333], ['DVD Shelves', 1300],
+  ['Popular Reading', 802], ['Round Rock', 734], ['New Books', 680],
+  ['Archives/Research', 639]
+].sort((a,b) => b[1]-a[1]);
+
+new Chart(document.getElementById('chart7'), {
+  type: 'bar',
+  data: {
+    labels: locData.map(d => d[0]),
+    datasets: [{ label: 'FY2024 Checkouts', data: locData.map(d => d[1]), backgroundColor: locData.map((d,i) => i < 3 ? maroon : (i < 6 ? maroonLight : goldLight)), borderRadius: 3 }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw.toLocaleString() + ' checkouts' } } },
+    scales: { x: { ticks: { callback: v => (v/1000)+'K' } }, y: { grid: { display: false } } }
+  }
+});
+
+/* ===== PREDICTIVE: Circulation Forecast Line Chart ===== */
+(() => {
+  const labels   = ['FY15','FY16','FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24','FY25','FY26'];
+  const actual   = [172909,161701,159229,142201,111846,86065,61659,64315,60726,64090, null, null];
+  const forecast = [null,null,null,null,null,null,61659,64315,60726,64090,63624,63994];
+
+  new Chart(document.getElementById('chartForecast'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Actual Circulation',
+          data: actual,
+          borderColor: maroon,
+          backgroundColor: maroon,
+          pointRadius: 5,
+          pointStyle: 'circle',
+          borderWidth: 3,
+          tension: 0.2,
+          spanGaps: false,
+          fill: false
+        },
+        {
+          label: 'Forecast (Linear FY21–24)',
+          data: forecast,
+          borderColor: teal,
+          backgroundColor: teal,
+          pointRadius: 6,
+          pointStyle: 'triangle',
+          borderWidth: 3,
+          borderDash: [8, 5],
+          tension: 0,
+          spanGaps: true,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 14, font: { size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + (ctx.raw ? ctx.raw.toLocaleString() : '—') } },
+        datalabels: {
+          display: function(ctx) {
+            /* Show label only for the two forecast points */
+            return ctx.datasetIndex === 1 && ctx.dataIndex >= 10;
+          },
+          color: teal,
+          font: { weight: 'bold', size: 12 },
+          anchor: 'end', align: 'top', offset: 4,
+          formatter: v => v ? '~' + v.toLocaleString() : ''
+        }
+      },
+      scales: {
+        y: { beginAtZero: false, min: 40000, ticks: { callback: v => (v/1000)+'K' }, title: { display: true, text: 'Annual Checkouts' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+})();
+
+/* ===== PRESCRIPTIVE: Reallocation Matrix Horizontal Bar ===== */
+(() => {
+  /* Sorted by % change ascending (worst decline first) */
+  const items = [
+    { name: 'DVD Shelves',        pct: -84.7, current: 1300  },
+    { name: 'Music Library',      pct: -66.9, current: 1370  },
+    { name: 'Juvenile',           pct: -62.9, current: 2940  },
+    { name: 'General Collection', pct: -29.2, current: 33756 },
+    { name: 'Graphic Novels',     pct: -28.7, current: 1778  },
+    { name: 'Game Shelves',       pct: -25.2, current: 113   },
+    { name: 'Laptops',            pct:  14.3, current: 3266  },
+    { name: 'Equipment/Keys',     pct:  66.2, current: 14616 },
+    { name: 'Secured Collection', pct:  67.0, current: 12601 }
+  ];
+
+  const colors = items.map(d => d.pct < -30 ? '#c0392b' : (d.pct < 0 ? '#f39c12' : '#27ae60'));
+
+  new Chart(document.getElementById('chartMatrix'), {
+    type: 'bar',
+    data: {
+      labels: items.map(d => d.name),
+      datasets: [{
+        label: '% Change',
+        data: items.map(d => d.pct),
+        backgroundColor: colors,
+        borderRadius: 3,
+        barThickness: 22
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const item = items[ctx.dataIndex];
+              return `${ctx.raw > 0 ? '+' : ''}${ctx.raw.toFixed(1)}%  (${item.current.toLocaleString()} loans FY24)`;
+            }
+          }
+        },
+        datalabels: {
+          display: true,
+          font: { weight: 'bold', size: 11 },
+          color: function(ctx) {
+            return ctx.dataset.data[ctx.dataIndex] < -30 ? '#fff' : (ctx.dataset.data[ctx.dataIndex] >= 0 ? '#27ae60' : '#f39c12');
+          },
+          anchor: function(ctx) {
+            return ctx.dataset.data[ctx.dataIndex] < 0 ? 'start' : 'end';
+          },
+          align: function(ctx) {
+            return ctx.dataset.data[ctx.dataIndex] < 0 ? 'start' : 'end';
+          },
+          offset: 4,
+          formatter: v => (v > 0 ? '+' : '') + v.toFixed(0) + '%'
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: '% Change (FY17→24 or FY21→24)' },
+          grid: { color: ctx => ctx.tick.value === 0 ? '#333' : 'rgba(0,0,0,0.06)' }
+        },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
