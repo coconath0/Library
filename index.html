@@ -609,8 +609,8 @@ body {
       [3] Texas State University Library. <em>2024 Engagement Data.</em> FOLIO Integrated Library System.<br>
       [4] National Center for Education Statistics. <em>IPEDS Completers & Admissions Data, 2019–2024.</em><br>
      
-      <strong style="color: var(--charcoal);">Acknowledgments:</strong> We thank the TXST University Library staff for providing access to historical circulation reports, the 2026 Open Datathon organizing committee for creating this data challenge, and Dr. [Faculty Advisor] for guidance on the analytical framework.<br><br>
-      <strong style="color: var(--charcoal);">AI Disclosure:</strong> AI tools (Claude, Anthropic) were used for data extraction assistance and code generation. All data values were manually verified against original TXST Library reports. All analytical conclusions and recommendations are the original work of the authors.<br>
+      <strong style="color: var(--charcoal);">Acknowledgments:</strong> We thank the TXST University Library staff for providing access to historical circulation reports, and the 2026 Open Datathon organizing committee for creating this data challenge.<br><br>
+      <strong style="color: var(--charcoal);">AI Disclosure:</strong> AI tools (Claude, Copilot) were used for data extraction assistance and code generation. All data values were manually verified against original TXST Library reports. All analytical conclusions and recommendations are the original work of the authors.<br>
       <strong style="color: var(--charcoal);">Data Note:</strong> FY2024 class-level patron data unavailable due to FOLIO system migration. Enrollment uses IPEDS total headcount.
     </p>
   </div>
@@ -644,9 +644,7 @@ const GREEN = '#27ae60';
 const BLUE = '#2980b9';
 const ORANGE = '#e67e22';
 
-// ════════════════════════════════════════
 // CHART 1: CIRCULATION DECLINE
-// ════════════════════════════════════════
 new Chart(document.getElementById('chart1'), {
   type: 'line',
   data: {
@@ -690,9 +688,7 @@ new Chart(document.getElementById('chart1'), {
   }
 });
 
-// ════════════════════════════════════════
 // CHART 2: TECHNOLOGY PIVOT (stacked bar)
-// ════════════════════════════════════════
 new Chart(document.getElementById('chart2'), {
   type: 'bar',
   data: {
@@ -726,9 +722,7 @@ new Chart(document.getElementById('chart2'), {
   }
 });
 
-// ════════════════════════════════════════
 // CHART 3: HEATMAP TABLE (interactive)
-// ════════════════════════════════════════
 (function buildHeatmap() {
   const collections = {
     'General Collection': [47703, 54828, 46753, 41391, 34239, 34276, 33279, 33756],
@@ -768,9 +762,7 @@ new Chart(document.getElementById('chart2'), {
   }
 })();
 
-// ════════════════════════════════════════
 // CHART 4: FORECAST
-// ════════════════════════════════════════
 (function() {
   const actual = [172909, 161701, 159229, 142201, 111846, 86065, 61659, 64315, 60726, 64090];
   const forecast = [null, null, null, null, null, null, null, null, null, 64090, 63624, 63994, 64364];
@@ -832,9 +824,7 @@ new Chart(document.getElementById('chart2'), {
   });
 })();
 
-// ════════════════════════════════════════
 // CHART 5: REALLOCATION MATRIX (horizontal bar)
-// ════════════════════════════════════════
 new Chart(document.getElementById('chart5'), {
   type: 'bar',
   data: {
