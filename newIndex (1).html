@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>TXST Library: The Case for Resource Reallocation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --maroon: #501214;
+  --maroon-deep: #3a0c0e;
+  --gold: #8b6914;
+  --gold-light: #c9a84c;
+  --cream: #f5f0e1;
+  --warm-bg: #faf8f4;
+  --charcoal: #2d2d2d;
+  --red: #c0392b;
+  --green: #27ae60;
+  --blue: #2980b9;
+  --orange: #e67e22;
+  --light-border: #e8e4dc;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--warm-bg);
+  color: var(--charcoal);
+  line-height: 1.6;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* HEADER */
+.poster-header {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-deep) 100%);
+  padding: 2rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.poster-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 30px,
+    rgba(255,255,255,0.015) 30px, rgba(255,255,255,0.015) 60px
+  );
+}
+.poster-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4vw, 3rem);
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.02em;
+  position: relative;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.poster-header .subtitle {
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  color: var(--gold-light);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+}
+.authors {
+  margin-top: 1rem;
+  color: rgba(255,255,255,0.75);
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  position: relative;
+  line-height: 1.5;
+}
+.authors strong { color: white; font-weight: 500; }
+
+/* BUTTON TO OTHER VISUALS */
+.view-more-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: var(--gold);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid var(--gold-light);
+}
+.view-more-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+}
+
+/* KPI BAR */
+.kpi-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--light-border);
+  border-bottom: 3px solid var(--maroon);
+  overflow-x: auto;
+}
+.kpi-card {
+  background: white;
+  padding: 1.2rem 0.8rem;
+  text-align: center;
+  transition: transform 0.2s;
+  min-width: 150px;
+}
+.kpi-card:hover { transform: translateY(-2px); background: var(--cream); }
+.kpi-label {
+  font-size: clamp(0.6rem, 1.5vw, 0.65rem);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #999;
+  margin-bottom: 0.3rem;
+}
+.kpi-value {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  font-weight: 900;
+}
+.kpi-value.red { color: var(--red); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.gold { color: var(--gold); }
+.kpi-sub { font-size: clamp(0.7rem, 1.5vw, 0.75rem); color: #aaa; margin-top: 0.2rem; }
+
+/* SECTIONS */
+.poster-body {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  width: 100%;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+.section:nth-child(1) { animation-delay: 0.1s; }
+.section:nth-child(2) { animation-delay: 0.2s; }
+.section:nth-child(3) { animation-delay: 0.3s; }
+.section:nth-child(4) { animation-delay: 0.4s; }
+.section:nth-child(5) { animation-delay: 0.5s; }
+.section:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-tag {
+  display: inline-block;
+  font-size: clamp(0.6rem, 1.5vw, 0.65rem);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--maroon);
+  background: rgba(80,18,20,0.08);
+  padding: 0.3rem 0.8rem;
+  border-radius: 2rem;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--maroon);
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--gold-light);
+  padding-bottom: 0.5rem;
+}
+
+.section p {
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  line-height: 1.75;
+  color: #555;
+  max-width: 100%;
+}
+
+/* RESEARCH Q */
+.research-question {
+  background: var(--cream);
+  border-left: 4px solid var(--gold);
+  padding: 1.2rem 1.5rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
+}
+.research-question p {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  font-style: italic;
+  color: var(--charcoal);
+  max-width: none;
+}
+
+/* CHART CONTAINERS */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  border: 1px solid var(--light-border);
+  transition: box-shadow 0.3s, transform 0.2s;
+  width: 100%;
+  overflow: hidden;
+}
+.chart-card:hover {
+  box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+.chart-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
+  color: var(--maroon);
+  margin-bottom: 0.3rem;
+}
+.chart-card .chart-subtitle {
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
+  color: #999;
+  margin-bottom: 1rem;
+}
+.chart-card canvas {
+  max-height: 300px;
+  width: 100% !important;
+  height: auto !important;
+}
+.chart-insight {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(80,18,20,0.03);
+  border-radius: 6px;
+  font-size: clamp(0.75rem, 2vw, 0.82rem);
+  color: #666;
+  border-left: 3px solid var(--gold-light);
+}
+.chart-insight strong { color: var(--maroon); }
+
+/* HEATMAP TABLE */
+.heatmap-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0.5rem -1.2rem;
+  padding: 0 1.2rem;
+}
+.heatmap-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  margin-top: 0.5rem;
+}
+.heatmap-table th {
+  padding: 0.6rem 0.4rem;
+  text-align: center;
+  font-weight: 500;
+  color: #888;
+  font-size: clamp(0.7rem, 1.8vw, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.heatmap-table th:first-child { text-align: left; }
+.heatmap-table td {
+  padding: 0.6rem 0.4rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  border-bottom: 1px solid #f0f0f0;
+  transition: transform 0.15s;
+}
+.heatmap-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+  color: var(--charcoal);
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+}
+.heatmap-table tr:hover td { transform: scale(1.02); }
+.heatmap-table .change-col {
+  font-weight: 700;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+}
+
+/* RECS */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.rec-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+  cursor: default;
+}
+.rec-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.rec-card.red { border-color: var(--red); }
+.rec-card.orange { border-color: var(--orange); }
+.rec-card.green { border-color: var(--green); }
+.rec-card.blue { border-color: var(--blue); }
+
+.rec-icon { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem; }
+.rec-title { font-weight: 700; font-size: clamp(0.75rem, 2vw, 0.85rem); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.rec-card.red .rec-title { color: var(--red); }
+.rec-card.orange .rec-title { color: var(--orange); }
+.rec-card.green .rec-title { color: var(--green); }
+.rec-card.blue .rec-title { color: var(--blue); }
+.rec-desc { font-size: clamp(0.75rem, 2vw, 0.82rem); color: #777; line-height: 1.5; }
+
+/* METHODOLOGY */
+.method-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.method-step {
+  background: white;
+  border-radius: 10px;
+  padding: 1.2rem;
+  border: 1px solid var(--light-border);
+  text-align: center;
+}
+.method-step .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--maroon);
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+.method-step h4 { font-size: clamp(0.85rem, 2vw, 0.9rem); color: var(--maroon); margin-bottom: 0.3rem; }
+.method-step p { font-size: clamp(0.75rem, 2vw, 0.8rem); color: #888; }
+
+/* FOOTER */
+.poster-footer {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-deep) 100%);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;
+}
+.poster-footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 30px,
+    rgba(255,255,255,0.015) 30px, rgba(255,255,255,0.015) 60px
+  );
+}
+.footer-content { position: relative; }
+.footer-content p {
+  color: rgba(255,255,255,0.6);
+  font-size: clamp(0.7rem, 1.8vw, 0.78rem);
+  max-width: 800px;
+  margin: 0.3rem auto;
+  line-height: 1.6;
+}
+.footer-content .refs { color: var(--gold-light); font-size: clamp(0.65rem, 1.8vw, 0.72rem); margin-top: 1rem; }
+
+/* RESPONSIVE BREAKPOINTS */
+@media (min-width: 768px) {
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-card.full-width {
+    grid-column: 1 / -1;
+  }
+  .poster-header {
+    padding: 3rem 2rem 2.5rem;
+  }
+  .poster-body {
+    padding: 2rem 1.5rem;
+  }
+  .rec-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .method-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .kpi-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .chart-card canvas {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .poster-header h1 {
+    font-size: 1.3rem;
+  }
+  .kpi-card {
+    padding: 1rem 0.6rem;
+  }
+  .rec-grid {
+    grid-template-columns: 1fr;
+  }
+  .method-steps {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="poster-header">
+  <h1>The Case for Resource Reallocation: A Decade of TXST Library Circulation Trends</h1>
+  <div class="subtitle">2026 Open Datathon • Bobcat Data Challenge • FY2014–FY2024</div>
+  <div class="authors">
+    <strong>Davos DeHoyos</strong>, <strong>Nathan Negera</strong>, <strong>Aleena Tomy</strong>, <strong>and Nathaly Ingol</strong><br>
+    Texas State University, San Marcos, TX
+  </div>
+  <a href="txst_library_visuals_v3.html" class="view-more-btn">View More Interactive Graphs</a>
+</header>
+
+<!-- KPI BAR -->
+<div class="kpi-bar">
+  <div class="kpi-card">
+    <div class="kpi-label">FY2024 Circulation</div>
+    <div class="kpi-value green">64,090</div>
+    <div class="kpi-sub">+5.5% from FY2023</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Fall 2024 Enrollment</div>
+    <div class="kpi-value gold">42,138</div>
+    <div class="kpi-sub">+1.1% from 2023</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Checkouts per Student</div>
+    <div class="kpi-value red">1.52</div>
+    <div class="kpi-sub">Down from 2.61 in FY2019</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">10-Year Circ Decline</div>
+    <div class="kpi-value red">−58%</div>
+    <div class="kpi-sub">153K (FY14) → 64K (FY24)</div>
+  </div>
+</div>
+
+<div class="poster-body">
+
+  <!-- INTRODUCTION -->
+  <div class="section">
+    <span class="section-tag">Introduction / Background</span>
+    <h2>From Stacks to Screens</h2>
+    <p>Academic libraries nationwide face a structural transformation as digital resources replace physical collections. At Texas State University — a growing R2 institution serving over 42,000 students — Alkek Library's total circulation has declined 58% over the past decade (FY2014–FY2024), even as enrollment has remained stable. Yet this headline decline obscures a more nuanced story: equipment checkouts have surged 66% since FY2021, the secured collection has grown 67%, and students continue to fill collaborative spaces daily. The question is not whether the library is still relevant, but whether its resources are aligned with how students actually use it.</p>
+    <div class="research-question">
+      <p>"What does a decade of TXST Library circulation data reveal about the shift from physical collections to technology and space demand, and how should the library prioritize its resource reallocation?"</p>
+    </div>
+    <p>We investigate this using a three-tier analytics framework — descriptive, predictive, and prescriptive — applied to 11 years of circulation reports (FY2014–FY2024), IPEDS enrollment data, and location-level checkout records across 13+ library collections.</p>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <div class="section">
+    <span class="section-tag">Methodology</span>
+    <h2>Data & Approach</h2>
+    <p>We employed a three-tier analytics framework across 11 years of library circulation data from inconsistent multi-table CSV exports, supplemented by IPEDS institutional enrollment records. Our novel contribution: disaggregating to the location level reveals that the overall decline masks divergent trajectories — some collections are collapsing while others are surging.</p>
+    <div class="method-steps">
+      <div class="method-step">
+        <div class="step-num">1</div>
+        <h4>Data Collection</h4>
+        <p>11 annual circulation reports (FY14–FY24) with inconsistent formats, IPEDS enrollment data (2019–2024), 2024 engagement metrics. Cross-verified all totals against source files.</p>
+      </div>
+      <div class="method-step">
+        <div class="step-num">2</div>
+        <h4>Descriptive Analysis</h4>
+        <p>Trend analysis across total circulation, 4 material types, patron groups, and 13+ physical locations. Per-capita normalization using IPEDS enrollment to isolate behavioral change from population change.</p>
+      </div>
+      <div class="method-step">
+        <div class="step-num">3</div>
+        <h4>Predictive & Prescriptive</h4>
+        <p>Linear regression on FY21–24 (post-COVID window) for baseline forecasting. Collections classified into action tiers — Move to ARC / Monitor / Invest More — based on trajectory and current volume.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="section">
+    <span class="section-tag">Results</span>
+    <h2>Key Findings</h2>
+
+    <div class="chart-grid">
+
+      <!-- Chart 1: Total Decline -->
+      <div class="chart-card">
+        <h3>① Total Circulation Decline</h3>
+        <div class="chart-subtitle">Annual checkout transactions, FY2014–FY2024</div>
+        <canvas id="chart1"></canvas>
+        <div class="chart-insight">
+          <strong>Finding:</strong> Circulation fell 58% over the decade, from 152,664 (FY2014) to 64,090 (FY2024). The decline began well before COVID (−27% by FY19), then COVID accelerated it. Post-pandemic, circulation has stabilized around 60–64K.
+        </div>
+      </div>
+
+      <!-- Chart 2: Tech Pivot -->
+      <div class="chart-card">
+        <h3>② The Technology Pivot</h3>
+        <div class="chart-subtitle">Checkout breakdown by material type, FY2021–FY2024</div>
+        <canvas id="chart2"></canvas>
+        <div class="chart-insight">
+          <strong>Finding:</strong> Equipment checkouts surged <strong>+66%</strong> (8,795 → 14,616) while print fell −3%. Non-traditional items now make up 28% of all checkouts, up from 20% in FY2020.
+        </div>
+      </div>
+
+      <!-- Chart 3: Heatmap Table -->
+      <div class="chart-card full-width">
+        <h3>③ Collection Usage by Location</h3>
+        <div class="chart-subtitle">Annual checkouts by collection, FY2017–FY2024. Color intensity = % of peak usage.</div>
+        <div class="heatmap-wrapper">
+          <table class="heatmap-table" id="heatmapTable"></table>
+        </div>
+        <div class="chart-insight">
+          <strong>Finding:</strong> DVD Shelves collapsed <strong>−85% total</strong> (−24%/yr CAGR), Juvenile Collection <strong>−63% total</strong> (−13%/yr CAGR) over FY17→24 — both are candidates for ARC relocation. General Collection is declining but still the largest single source of loans.
+        </div>
+      </div>
+
+      <!-- Chart 4: Forecast -->
+      <div class="chart-card">
+        <h3>④ Circulation Forecast</h3>
+        <div class="chart-subtitle">Recent trend projection, FY2025–FY2027</div>
+        <canvas id="chart4"></canvas>
+        <div class="chart-insight">
+          <strong>Finding:</strong> Based on FY21–24 trend (~+370/yr), circulation is projected at ~63,600 for FY2025 — a new, stable baseline. The real growth story is in equipment and technology.
+        </div>
+      </div>
+
+      <!-- Chart 5: Reallocation Matrix -->
+      <div class="chart-card">
+        <h3>⑤ Reallocation Priority — Annual Growth Rate (CAGR)</h3>
+        <div class="chart-subtitle">Compound annual growth rate by collection — period shown in label</div>
+        <canvas id="chart5"></canvas>
+        <div class="chart-insight">
+          <strong>Finding:</strong> Three clear action tiers emerge. Each item's CAGR is calculated over its available data range (shown in parentheses) to avoid misleading comparisons across unequal time spans. Collections with CAGR ≤ −10% should move to ARC, moderate declines need monitoring, and growing services need investment.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DISCUSSION / CONCLUSIONS -->
+  <div class="section">
+    <span class="section-tag">Discussion / Conclusions</span>
+    <h2>Prescriptive Recommendations</h2>
+    <p>Our analysis reveals a library in transition — not decline. The 58% drop in total circulation reflects a national shift away from physical media, not a loss of library relevance. Three key insights emerge: (1) the decline is structural, not cyclical — circulation was falling steadily before COVID; (2) the growth story is in technology — equipment and secured collections are the only categories expanding; (3) not all collections are equal — the aggregate decline masks sharp divergence at the location level. We propose a four-tier reallocation strategy:</p>
+
+    <div class="rec-grid">
+      <div class="rec-card red">
+        <div class="rec-icon">🔴</div>
+        <div class="rec-title">Move to ARC</div>
+        <div class="rec-desc">DVDs (−24%/yr CAGR), Juvenile (−13%/yr), Music (−15%/yr) — all FY17→24. Relocate to the Archives Research Center to free floor space.</div>
+      </div>
+      <div class="rec-card orange">
+        <div class="rec-icon">🟡</div>
+        <div class="rec-title">Monitor</div>
+        <div class="rec-desc">General Collection (−5%/yr), Graphic Novels (−5%/yr), Game Shelves (−4%/yr) — all FY17→24. Declining but still actively used.</div>
+      </div>
+      <div class="rec-card green">
+        <div class="rec-icon">🟢</div>
+        <div class="rec-title">Invest More</div>
+        <div class="rec-desc">Equipment (+18%/yr, FY21→24), Laptops (+14%/yr, FY23→24), Secured Coll. (+67%/yr, FY23→24). Expand capacity and checkout infrastructure.</div>
+      </div>
+      <div class="rec-card blue">
+        <div class="rec-icon">🔵</div>
+        <div class="rec-title">Repurpose Space</div>
+        <div class="rec-desc">Convert freed floor space into study rooms, tech checkout stations, and collaborative work areas.</div>
+      </div>
+    </div>
+
+    <p style="margin-top: 1.5rem;">The library's future isn't fewer services — it's <em>different</em> services. Students still come to Alkek Library; they come for space, technology, and collaboration rather than books and DVDs. The current 60–64K circulation baseline likely represents the stable floor of core physical demand. Aligning resources with this reality — moving low-use collections to the ARC, expanding equipment lending, and repurposing freed space — will maximize the library's impact per square foot and per dollar invested.</p>
+  </div>
+
+  <!-- REFERENCES -->
+  <div class="section">
+    <span class="section-tag">References & Acknowledgments</span>
+    <h2>Sources</h2>
+    <p style="font-size: 0.85rem; color: #888;">
+      [1] Texas State University Library. <em>Annual Circulation Reports, FY2014–FY2024.</em> Alkek Library, San Marcos, TX.<br>
+      [2] National Center for Education Statistics. <em>IPEDS Enrollment Data, 2019–2024.</em> U.S. Department of Education.<br>
+      [3] Texas State University Library. <em>2024 Engagement Data.</em> FOLIO Integrated Library System.<br>
+      [4] National Center for Education Statistics. <em>IPEDS Completers & Admissions Data, 2019–2024.</em><br>
+     
+      <strong style="color: var(--charcoal);">Acknowledgments:</strong> We thank the TXST University Library staff for providing access to historical circulation reports, and the 2026 Open Datathon organizing committee for creating this data challenge.<br><br>
+      <strong style="color: var(--charcoal);">AI Disclosure:</strong> AI tools (Claude, Copilot) were used for data extraction assistance and code generation. All data values were manually verified against original TXST Library reports. All analytical conclusions and recommendations are the original work of the authors.<br>
+      <strong style="color: var(--charcoal);">Data Note:</strong> FY2024 class-level patron data unavailable due to FOLIO system migration. Enrollment uses IPEDS total headcount.
+    </p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="poster-footer">
+  <div class="footer-content">
+    <p><strong style="color: var(--gold-light);">Texas State University</strong> • Alkek Library • 2026 Open Datathon</p>
+    <p class="refs">Data Sources: TXST Library Circulation Reports (FY2014–FY2024) • IPEDS Enrollment Data • FOLIO System Migration Notes</p>
+  </div>
+</footer>
+
+<script>
+// GLOBAL CHART DEFAULTS
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.padding = 12;
+Chart.defaults.plugins.tooltip.backgroundColor = '#2d2d2d';
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+Chart.defaults.plugins.tooltip.padding = 10;
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = true;
+
+const MAROON = '#501214';
+const GOLD = '#8b6914';
+const RED = '#c0392b';
+const GREEN = '#27ae60';
+const BLUE = '#2980b9';
+const ORANGE = '#e67e22';
+
+// CHART 1: CIRCULATION DECLINE
+new Chart(document.getElementById('chart1'), {
+  type: 'line',
+  data: {
+    labels: ['FY14','FY15','FY16','FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24'],
+    datasets: [{
+      label: 'Total Circulation',
+      data: [152664, 172909, 161701, 159229, 142201, 111846, 86065, 61659, 64315, 60726, 64090],
+      borderColor: MAROON,
+      backgroundColor: 'rgba(80,18,20,0.08)',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: MAROON,
+      pointBorderWidth: 2,
+      pointHoverRadius: 7,
+      fill: true,
+      tension: 0.3,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.parsed.y.toLocaleString()} checkouts`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        min: 40000,
+        ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
+        grid: { color: 'rgba(0,0,0,0.04)' }
+      },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// CHART 2: TECHNOLOGY PIVOT (stacked bar)
+new Chart(document.getElementById('chart2'), {
+  type: 'bar',
+  data: {
+    labels: ['FY2021', 'FY2022', 'FY2023', 'FY2024'],
+    datasets: [
+      { label: 'Print/Media', data: [45702, 47984, 46103, 44715], backgroundColor: MAROON, borderRadius: 3 },
+      { label: 'Equipment/Keys', data: [8795, 7388, 8371, 14616], backgroundColor: GREEN, borderRadius: 3 },
+      { label: 'Laptops', data: [4727, 5356, 2858, 3266], backgroundColor: BLUE, borderRadius: 3 },
+      { label: 'Reserve', data: [2435, 3587, 3394, 1493], backgroundColor: ORANGE, borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`
+        }
+      }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: {
+        stacked: true,
+        ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
+        grid: { color: 'rgba(0,0,0,0.04)' }
+      }
+    }
+  }
+});
+
+// CHART 3: HEATMAP TABLE (interactive)
+(function buildHeatmap() {
+  const collections = {
+    'General Collection': [47703, 54828, 46753, 41391, 34239, 34276, 33279, 33756],
+    'DVD Shelves': [8514, 6279, 5414, 3836, 2329, 2199, 1712, 1300],
+    'Graphic Novels': [2493, 2658, 1688, 1961, 1612, 1990, 2222, 1778],
+    'Juvenile Collection': [7919, 7136, 6077, 4724, 2856, 3470, 2869, 2940],
+    'Game Shelves': [151, 104, 50, 74, 84, 102, 80, 113],
+  };
+  const years = ['FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24'];
+  const table = document.getElementById('heatmapTable');
+
+  // Header
+  let thead = '<tr><th></th>';
+  years.forEach(y => thead += `<th>${y}</th>`);
+  thead += '<th>Change</th></tr>';
+  table.innerHTML = thead;
+
+  // Rows
+  for (const [name, vals] of Object.entries(collections)) {
+    const peak = Math.max(...vals);
+    const change = ((vals[7] - vals[0]) / vals[0] * 100).toFixed(0);
+    const changeColor = change < -30 ? RED : (change < 0 ? ORANGE : GREEN);
+
+    let row = `<tr><td>${name}</td>`;
+    vals.forEach(v => {
+      const pct = v / peak * 100;
+      const h = pct > 66 ? 120 : (pct > 33 ? 40 + (pct-33)/33*80 : 0 + pct/33*40);
+      const s = pct > 50 ? '55%' : '65%';
+      const l = pct > 50 ? '42%' : `${30 + (50-pct)*0.6}%`;
+      const bg = `hsl(${h}, ${s}, ${l})`;
+      const textColor = pct < 40 ? '#fff' : '#222';
+      row += `<td style="background:${bg};color:${textColor};border-radius:4px;" title="${name}: ${v.toLocaleString()} (${(pct).toFixed(0)}% of peak)">${v.toLocaleString()}</td>`;
+    });
+    row += `<td class="change-col" style="color:${changeColor}">${change > 0 ? '+' : ''}${change}%</td>`;
+    row += '</tr>';
+    table.innerHTML += row;
+  }
+})();
+
+// CHART 4: FORECAST
+(function() {
+  const actual = [152664, 172909, 161701, 159229, 142201, 111846, 86065, 61659, 64315, 60726, 64090];
+  const forecast = [null, null, null, null, null, null, null, null, null, null, 64090, 63624, 63994, 64364];
+  const labels = ['FY14','FY15','FY16','FY17','FY18','FY19','FY20','FY21','FY22','FY23','FY24','FY25','FY26','FY27'];
+
+  new Chart(document.getElementById('chart4'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Actual',
+          data: actual.concat([null, null, null]),
+          borderColor: MAROON,
+          backgroundColor: 'rgba(80,18,20,0.06)',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: MAROON,
+          pointBorderWidth: 2,
+          fill: true,
+          tension: 0.3,
+        },
+        {
+          label: 'Forecast',
+          data: forecast,
+          borderColor: GOLD,
+          borderDash: [6, 3],
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#f5f0e1',
+          pointBorderColor: GOLD,
+          pointBorderWidth: 2,
+          fill: false,
+          tension: 0,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y ? `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}` : null,
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 40000,
+          ticks: { callback: v => (v/1000)+'K', font: { size: 10 } },
+          grid: { color: 'rgba(0,0,0,0.04)' }
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+})();
+
+// CHART 5: REALLOCATION MATRIX (horizontal bar) — CAGR with period labels
+new Chart(document.getElementById('chart5'), {
+  type: 'bar',
+  data: {
+    labels: [
+      'Equipment/Keys (FY21→24, 3yr)',
+      'Secured Coll. (FY23→24, 1yr)',
+      'Laptops (FY23→24, 1yr)',
+      'Game Shelves (FY17→24, 7yr)',
+      'Graphic Novels (FY17→24, 7yr)',
+      'General Coll. (FY17→24, 7yr)',
+      'Juvenile (FY17→24, 7yr)',
+      'Music Library (FY17→24, 7yr)',
+      'DVD Shelves (FY17→24, 7yr)'
+    ],
+    datasets: [{
+      label: 'CAGR %',
+      data: [18.4, 67.0, 14.3, -4.1, -4.7, -4.8, -13.2, -14.6, -23.5],
+      backgroundColor: [GREEN, GREEN, GREEN, ORANGE, ORANGE, ORANGE, RED, RED, RED],
+      borderRadius: 4,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.x;
+            const vols = {
+              'Equipment/Keys (FY21→24, 3yr)': '8,795 → 14,616',
+              'Secured Coll. (FY23→24, 1yr)': '7,544 → 12,601',
+              'Laptops (FY23→24, 1yr)': '2,858 → 3,266',
+              'Game Shelves (FY17→24, 7yr)': '151 → 113',
+              'Graphic Novels (FY17→24, 7yr)': '2,493 → 1,778',
+              'General Coll. (FY17→24, 7yr)': '47,703 → 33,756',
+              'Juvenile (FY17→24, 7yr)': '7,919 → 2,940',
+              'Music Library (FY17→24, 7yr)': '4,141 → 1,370',
+              'DVD Shelves (FY17→24, 7yr)': '8,514 → 1,300'
+            };
+            const name = ctx.label;
+            return [`CAGR: ${v > 0 ? '+' : ''}${v.toFixed(1)}%/yr`, `Range: ${vols[name] || 'N/A'}`];
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: v => (v > 0 ? '+' : '') + v + '%', font: { size: 10 } },
+        title: { display: true, text: 'CAGR (% per year)', font: { size: 10 } }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { font: { weight: 500, size: 10 } }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
