@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TXST Library Circulation &amp; Enrollment — Bobcat Data</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --maroon: #501214;
+    --maroon-light: #7a2e31;
+    --gold: #6a5638;
+    --gold-accent: #d4a843;
+    --cream: #f5f0e6;
+    --cream-dark: #e8e0d0;
+    --bg: #faf8f4;
+    --card: #ffffff;
+    --text: #2a2420;
+    --text-muted: #6b5e54;
+    --teal: #1a6b5a;
+    --blue: #2c5f9e;
+    --red-band: #b83230;
+    --yellow-band: #d4930a;
+    --green-band: #1d8a4a;
+    --shadow: 0 2px 16px rgba(80, 18, 20, 0.07);
+    --shadow-lg: 0 8px 32px rgba(80, 18, 20, 0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--maroon) 0%, #3a0c0e 60%, #1f0708 100%);
+    color: white;
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(212,168,67,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(212,168,67,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+    position: relative;
+  }
+  .hero p {
+    font-size: 1rem;
+    opacity: 0.75;
+    font-weight: 500;
+    position: relative;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(212,168,67,0.18);
+    border: 1px solid rgba(212,168,67,0.35);
+    color: var(--gold-accent);
+    padding: 0.25rem 0.9rem;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+  /* ── STAT ROW ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: -2rem auto 2.5rem;
+    position: relative;
+    z-index: 2;
+  }
+  .stat-box {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1.4rem 1.3rem;
+    box-shadow: var(--shadow-lg);
+    border-top: 3px solid var(--maroon);
+    text-align: center;
+  }
+  .stat-box .label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+  .stat-box .value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--maroon);
+    line-height: 1.15;
+  }
+  .stat-box .sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  /* ── CARDS ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1.8rem 1.6rem 1.4rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.25s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); }
+  .card.full { grid-column: 1 / -1; }
+  .card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.18rem;
+    font-weight: 400;
+    color: var(--maroon);
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .chart-wrap { position: relative; height: 340px; }
+  .chart-wrap.tall { height: 420px; }
+
+  .insight {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--cream);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.5;
+    border-left: 3px solid var(--gold-accent);
+  }
+  .insight strong { color: var(--maroon); }
+
+  .note {
+    margin-top: 0.6rem;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── CAGR CHART (custom HTML/CSS) ── */
+  .cagr-chart { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.5rem 0; }
+  .cagr-row {
+    display: grid;
+    grid-template-columns: 240px 1fr 70px;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.82rem;
+  }
+  .cagr-label {
+    text-align: right;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .cagr-label .period {
+    display: block;
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .cagr-bar-container {
+    position: relative;
+    height: 28px;
+    background: #f0ede8;
+    border-radius: 6px;
+    overflow: visible;
+  }
+  .cagr-bar-container .zero-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    background: var(--text);
+    z-index: 2;
+    opacity: 0.35;
+  }
+  .cagr-bar {
+    position: absolute;
+    top: 3px;
+    height: 22px;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    min-width: 2px;
+  }
+  .cagr-value {
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* CAGR legend */
+  .cagr-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--cream-dark);
+    font-size: 0.78rem;
+    flex-wrap: wrap;
+  }
+  .cagr-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+  }
+  .cagr-legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--cream-dark);
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+    .cagr-row { grid-template-columns: 160px 1fr 60px; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="badge">Bobcat Data</span>
+  <h1>TXST Library Circulation vs. Student Enrollment</h1>
+  <p>2026 Open Datathon — FY2014–FY2024</p>
+</div>
+
+<div class="container">
+
+  <!-- ═══ STAT BOXES ═══ -->
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="label">FY2024 Circulation</div>
+      <div class="value">64,090</div>
+      <div class="sub">+5.5% from FY2023</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">Fall 2024 Enrollment</div>
+      <div class="value">42,138</div>
+      <div class="sub">+1.1% from 2023</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">Checkouts per Student</div>
+      <div class="value">1.52</div>
+      <div class="sub">Down from 2.61 in FY2019</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">10-Year Circ Decline</div>
+      <div class="value">−58%</div>
+      <div class="sub">153K (FY2014) → 64K (FY2024)</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ═══ CHART 1: ANNUAL CIRCULATION (FY2014–FY2024) ═══ -->
+    <div class="card full">
+      <h2>Annual Library Circulation (FY2014–FY2024)</h2>
+      <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Circulation declined 58% over the decade, from 152,664 in FY2014 to 64,090 in FY2024. The decline began well before COVID (−30% from FY2014 to FY2019), then accelerated sharply. Post-COVID recovery has stabilized around 60–64K.</div>
+    </div>
+
+    <!-- ═══ CHART 2: CIRC VS ENROLLMENT ═══ -->
+    <div class="card full">
+      <h2>Circulation vs. Enrollment (FY2019–FY2024)</h2>
+      <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> While enrollment held steady at ~42K, circulation per student dropped from 2.61 to 1.52 — a 42% decline in per-capita library usage in six years, suggesting a behavioral shift in how students access resources.</div>
+    </div>
+
+    <!-- ═══ CHART 3: BY TYPE STACKED ═══ -->
+    <div class="card">
+      <h2>Circulation by Material Type (FY2020–2024)</h2>
+      <div class="chart-wrap"><canvas id="chart3"></canvas></div>
+      <div class="note">Print/Media includes books, periodicals, and AV. Equipment/Keys includes cameras, projectors, calculators, etc.</div>
+    </div>
+
+    <!-- ═══ CHART 4: EQUIPMENT SHARE ═══ -->
+    <div class="card">
+      <h2>Equipment &amp; Laptops vs. Print Share (FY2020–2024)</h2>
+      <div class="chart-wrap"><canvas id="chart4"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Equipment checkouts surged 75% in FY2024, while print fell. Non-traditional items now make up 28% of all checkouts, up from 20% in FY2020.</div>
+    </div>
+
+    <!-- ═══ CHART 5: PATRON PIE ═══ -->
+    <div class="card">
+      <h2>Borrowing by Patron Group — FY2024</h2>
+      <div class="chart-wrap"><canvas id="chart5"></canvas></div>
+    </div>
+
+    <!-- ═══ CHART 6: PER CAPITA ═══ -->
+    <div class="card">
+      <h2>Checkouts per Student (FY2019–FY2024)</h2>
+      <div class="chart-wrap"><canvas id="chart6"></canvas></div>
+      <div class="insight"><strong>Key finding:</strong> Undergraduate checkouts rebounded 17% from FY2023 to FY2024, while graduate borrowing continued to decline — possibly reflecting greater digital resource use among grad students.</div>
+    </div>
+
+    <!-- ═══ CHART 7: CAGR RESOURCE REALLOCATION ═══ -->
+    <div class="card full">
+      <h2>Resource Reallocation Priority — Annual Growth Rate (CAGR)</h2>
+      <div id="cagrChart" class="cagr-chart"></div>
+      <div class="cagr-legend">
+        <span><span class="dot" style="background:var(--red-band)"></span> Steep Decline (CAGR ≤ −10%) — Consider ARC transfer</span>
+        <span><span class="dot" style="background:var(--yellow-band)"></span> Moderate Decline — Monitor</span>
+        <span><span class="dot" style="background:var(--green-band)"></span> Growing — Invest more</span>
+      </div>
+      <div class="insight"><strong>Key finding:</strong> Physical collections are declining at −5% to −24% annually, while technology lending (equipment, laptops, secured items) is growing +14% to +67% per year. Each item's growth rate is calculated over its available data range, shown in parentheses, to avoid misleading comparisons across unequal time spans.</div>
+      <div class="note">CAGR = Compound Annual Growth Rate. Location-based items available FY2017–2024 (7 years). Equipment/Keys available FY2021–2024 (3 years). Laptops and Secured Collection available FY2023–2024 (1 year).</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  TXST Alkek Library Circulation Data — 2026 Open Datathon, Bobcat Data Challenge<br>
+  Data sources: TXST Library Circulation Reports (FY2014–FY2024) · IPEDS Enrollment (2019–2024)
+</div>
+
+<script>
+/* ──────────────────────────────
+   PALETTE & DEFAULTS
+   ────────────────────────────── */
+const M   = '#501214';   // maroon
+const ML  = '#7a2e31';   // maroon light
+const G   = '#6a5638';   // gold
+const GA  = '#d4a843';   // gold accent
+const T   = '#1a6b5a';   // teal
+const B   = '#2c5f9e';   // blue
+const GL  = '#e8c875';   // gold light
+
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+const fmtK = v => (v/1000).toFixed(0) + 'K';
+const fmtComma = v => v.toLocaleString();
+
+/* ──────────────────────────────
+   CHART 1 — ANNUAL CIRCULATION (FY2014–FY2024)
+   ────────────────────────────── */
+const circYears = ['FY2014','FY2015','FY2016','FY2017','FY2018','FY2019','FY2020','FY2021','FY2022','FY2023','FY2024'];
+const circData  = [152664, 172909, 161701, 159229, 142201, 111846, 86065, 61659, 64315, 60726, 64090];
+
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: {
+    labels: circYears,
+    datasets: [{
+      label: 'Annual Checkouts',
+      data: circData,
+      backgroundColor: circData.map((_, i) => {
+        if (i <= 5) return M;
+        if (i === 6) return '#a04244';  // COVID year
+        if (i === 7) return '#c06062';  // recovery
+        return ML;
+      }),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtComma(ctx.raw) + ' checkouts' } }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: fmtK }, title: { display: true, text: 'Total Checkouts' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+/* ──────────────────────────────
+   CHART 2 — CIRC vs ENROLLMENT (FY2019–FY2024)
+   ────────────────────────────── */
+const overlapYears = ['FY2019','FY2020','FY2021','FY2022','FY2023','FY2024'];
+const overlapCirc  = [111846, 86065, 61659, 64315, 60726, 64090];
+const overlapEnr   = [42780, 42292, 42111, 41900, 41676, 42138];
+const perStudent   = overlapCirc.map((c, i) => +(c / overlapEnr[i]).toFixed(2));
+
+new Chart(document.getElementById('chart2'), {
+  type: 'bar',
+  data: {
+    labels: overlapYears,
+    datasets: [
+      { label: 'Circulation', data: overlapCirc, backgroundColor: M, borderRadius: 4, yAxisID: 'y', order: 2 },
+      { label: 'Enrollment', data: overlapEnr, backgroundColor: GA, borderRadius: 4, yAxisID: 'y', order: 3 },
+      { label: 'Checkouts per Student', data: perStudent, type: 'line', borderColor: T, backgroundColor: T,
+        pointRadius: 6, pointStyle: 'rectRot', borderWidth: 3, yAxisID: 'y1', order: 1 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + (ctx.raw > 100 ? fmtComma(ctx.raw) : ctx.raw) } } },
+    scales: {
+      y:  { beginAtZero: true, position: 'left', ticks: { callback: fmtK }, title: { display: true, text: 'Count' } },
+      y1: { beginAtZero: true, position: 'right', min: 0, max: 3.5, grid: { drawOnChartArea: false }, title: { display: true, text: 'Checkouts per Student' } },
+      x:  { grid: { display: false } }
+    }
+  }
+});
+
+/* ──────────────────────────────
+   CHART 3 — BY TYPE STACKED (FY2020–2024)
+   ────────────────────────────── */
+new Chart(document.getElementById('chart3'), {
+  type: 'bar',
+  data: {
+    labels: ['FY2020','FY2021','FY2022','FY2023','FY2024'],
+    datasets: [
+      { label: 'Print/Media',    data: [60516, 45702, 47984, 46103, 44715], backgroundColor: M },
+      { label: 'Reserve',        data: [8432, 2435, 3587, 3394, 1493],      backgroundColor: GL },
+      { label: 'Equipment/Keys', data: [7399, 8795, 7388, 8371, 14616],     backgroundColor: T },
+      { label: 'Laptops',        data: [9718, 4727, 5356, 2858, 3266],      backgroundColor: B }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtComma(ctx.raw) } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, ticks: { callback: fmtK } }
+    }
+  }
+});
+
+/* ──────────────────────────────
+   CHART 4 — EQUIPMENT SHARE LINE
+   ────────────────────────────── */
+const totals = [86065, 61659, 64315, 60726, 64090];
+const equipLaptops = [[7399,9718],[8795,4727],[7388,5356],[8371,2858],[14616,3266]];
+const equipPct = equipLaptops.map((e,i) => +((e[0]+e[1])/totals[i]*100).toFixed(1));
+const printPct = [[60516],[45702],[47984],[46103],[44715]].map((p,i) => +(p[0]/totals[i]*100).toFixed(1));
+
+new Chart(document.getElementById('chart4'), {
+  type: 'line',
+  data: {
+    labels: ['FY2020','FY2021','FY2022','FY2023','FY2024'],
+    datasets: [
+      { label: '% Print/Media', data: printPct, borderColor: M, backgroundColor: M, tension: 0.3, pointRadius: 5, borderWidth: 2.5 },
+      { label: '% Equipment + Laptops', data: equipPct, borderColor: T, backgroundColor: T, tension: 0.3, pointRadius: 5, borderWidth: 2.5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      y: { min: 0, max: 85, ticks: { callback: v => v + '%' }, title: { display: true, text: 'Share of Total Checkouts' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+/* ──────────────────────────────
+   CHART 5 — PATRON DOUGHNUT FY2024
+   ────────────────────────────── */
+const patronLabels = ['Undergraduate', 'Graduate', 'Faculty', 'Staff', 'Other (ILL, etc.)'];
+const patronData   = [31298, 4618, 3481, 4802, 19891];
+const patronTotal  = patronData.reduce((a,b) => a+b, 0);
+
+new Chart(document.getElementById('chart5'), {
+  type: 'doughnut',
+  data: {
+    labels: patronLabels,
+    datasets: [{
+      data: patronData,
+      backgroundColor: [M, GA, T, B, '#999'],
+      borderWidth: 2,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 14 } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const pct = (ctx.raw / patronTotal * 100).toFixed(1);
+            return ctx.label + ': ' + fmtComma(ctx.raw) + ' (' + pct + '%)';
+          }
+        }
+      },
+      /* Percentage labels on the chart */
+      datalabels: false
+    }
+  },
+  plugins: [{
+    id: 'pctLabels',
+    afterDraw(chart) {
+      const { ctx, chartArea } = chart;
+      const meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.font = "600 12px 'DM Sans', sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      meta.data.forEach((arc, i) => {
+        const pct = (patronData[i] / patronTotal * 100).toFixed(1);
+        if (parseFloat(pct) < 4) return; // skip tiny slices
+        const { x, y } = arc.tooltipPosition();
+        ctx.fillStyle = '#fff';
+        ctx.fillText(pct + '%', x, y);
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+/* ──────────────────────────────
+   CHART 6 — PER CAPITA BAR
+   ────────────────────────────── */
+new Chart(document.getElementById('chart6'), {
+  type: 'bar',
+  data: {
+    labels: overlapYears,
+    datasets: [{
+      label: 'Checkouts per Student',
+      data: perStudent,
+      backgroundColor: perStudent.map(v => v >= 2 ? M : ML),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' checkouts/student' } }
+    },
+    scales: {
+      y: { beginAtZero: true, max: 3, title: { display: true, text: 'Checkouts per Enrolled Student' } },
+      x: { grid: { display: false } }
+    }
+  },
+  plugins: [{
+    id: 'valueLabels',
+    afterDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.font = "700 13px 'DM Sans', sans-serif";
+      ctx.textAlign = 'center';
+      ctx.fillStyle = M;
+      meta.data.forEach((bar, i) => {
+        ctx.fillText(perStudent[i].toFixed(2), bar.x, bar.y - 8);
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+/* ──────────────────────────────
+   CHART 7 — CAGR HORIZONTAL BAR (custom HTML)
+   ────────────────────────────── */
+const collections = [
+  { name: 'DVD Shelves',        period: 'FY17→24 · 7yr', cagr: -23.5, band: 'red' },
+  { name: 'Music Library',      period: 'FY17→24 · 7yr', cagr: -14.6, band: 'red' },
+  { name: 'Juvenile',           period: 'FY17→24 · 7yr', cagr: -13.2, band: 'red' },
+  { name: 'General Collection', period: 'FY17→24 · 7yr', cagr: -4.8,  band: 'yellow' },
+  { name: 'Graphic Novels',     period: 'FY17→24 · 7yr', cagr: -4.7,  band: 'yellow' },
+  { name: 'Game Shelves',       period: 'FY17→24 · 7yr', cagr: -4.1,  band: 'yellow' },
+  { name: 'Laptops',            period: 'FY23→24 · 1yr', cagr: +14.3, band: 'green' },
+  { name: 'Equipment/Keys',     period: 'FY21→24 · 3yr', cagr: +18.4, band: 'green' },
+  { name: 'Secured Collection', period: 'FY23→24 · 1yr', cagr: +67.0, band: 'green' },
+];
+
+const maxAbs = 70; // scale extent
+
+const bandColor = { red: 'var(--red-band)', yellow: 'var(--yellow-band)', green: 'var(--green-band)' };
+
+const cagrContainer = document.getElementById('cagrChart');
+
+collections.forEach(c => {
+  const row = document.createElement('div');
+  row.className = 'cagr-row';
+
+  // Label
+  const label = document.createElement('div');
+  label.className = 'cagr-label';
+  label.innerHTML = `${c.name}<span class="period">${c.period}</span>`;
+
+  // Bar container
+  const barWrap = document.createElement('div');
+  barWrap.className = 'cagr-bar-container';
+  const zeroLine = document.createElement('div');
+  zeroLine.className = 'zero-line';
+  barWrap.appendChild(zeroLine);
+
+  const bar = document.createElement('div');
+  bar.className = 'cagr-bar';
+  bar.style.background = bandColor[c.band];
+
+  const pct = Math.min(Math.abs(c.cagr) / maxAbs * 50, 50); // half of container
+  if (c.cagr < 0) {
+    bar.style.right = '50%';
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = pct + '%'; }, 100);
+    bar.style.borderRadius = '4px 0 0 4px';
+  } else {
+    bar.style.left = '50%';
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = pct + '%'; }, 100);
+    bar.style.borderRadius = '0 4px 4px 0';
+  }
+  barWrap.appendChild(bar);
+
+  // Value
+  const val = document.createElement('div');
+  val.className = 'cagr-value';
+  val.style.color = bandColor[c.band];
+  val.textContent = (c.cagr > 0 ? '+' : '') + c.cagr.toFixed(1) + '%';
+
+  row.appendChild(label);
+  row.appendChild(barWrap);
+  row.appendChild(val);
+  cagrContainer.appendChild(row);
+});
+</script>
+</body>
+</html>
